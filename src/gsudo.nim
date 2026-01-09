@@ -1,7 +1,7 @@
 # ========================================================================================
 #
 #                                   Gsudo
-#                          version 0.1.0 by Mac_Taylor
+#                          version 1.0.0 by Mac_Taylor
 #
 # ========================================================================================
 
@@ -73,13 +73,16 @@ proc passwordPromt(title: string): string =
   return password
 
 proc main() =
-  if paramCount() > 1:
+  if paramCount() > 2:
     echo "error: too many paramters"
     quit(0)
   elif paramCount() == 0:
     return
 
-  let arg = paramStr(1)
+  let arg = if paramCount() == 1:
+    paramStr(1)
+  else:
+    paramStr(1) & " " & paramStr(2)
   var cmd: string
   var status: int
   var password: string
