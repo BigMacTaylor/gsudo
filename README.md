@@ -8,6 +8,7 @@ A simple tool to run graphical apps with sudo. It was built and tested on [sway 
 gsudo pcmanfm
 ```
 
-WARNING! It is highly recommended not to run graphical apps with sudo.
-Doing so can cause serious problems, such as currupt file permissions in your home directory,
-which can prevent you from logging in. Please use with caution.
+#### !!!WARNING!!!
+Running graphical apps with sudo is highly discouraged.
+Doing so can cause serious file permission issues, and can even prevent you from logging in.
+Please use with caution.

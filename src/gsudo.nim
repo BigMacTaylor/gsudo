@@ -1,13 +1,31 @@
 # ========================================================================================
 #
 #                                   Gsudo
-#                          version 1.0.0 by Mac_Taylor
+#                          version 1.0.1 by Mac_Taylor
 #
 # ========================================================================================
 
-import nim2gtk/[gtk, glib, gobject]
+import nim2gtk/[gtk, gdk, glib, gobject]
 import std/os
 import osproc
+
+const cssData =
+  """
+entry {
+    border-radius: 8px;
+    padding: 6px;
+}
+button {
+    border-radius: 8px;
+    min-width: 16px;
+    min-height: 16px;
+    padding: 10px;
+}
+buttonbox {
+    padding: 6px;
+}
+
+"""
 
 proc passwordPromt(title: string): string =
   gtk.init()
@@ -17,6 +35,12 @@ proc passwordPromt(title: string): string =
   dialog.resizable = false
   dialog.setPosition(WindowPosition.center)
 
+  let cssProvider = getDefaultCssProvider()
+  discard cssProvider.loadFromData(cssData)
+  addProviderForScreen(
+    getDefaultScreen(), cssProvider, STYLE_PROVIDER_PRIORITY_APPLICATION
+  )
+
   let contentArea = getContentArea(dialog)
   let actionArea = getActionArea(dialog)
 
@@ -24,8 +48,8 @@ proc passwordPromt(title: string): string =
   headerBar.title = title
 
   cast[ButtonBox](actionArea).setLayout(ButtonBoxStyle.expand)
-  actionArea.setSpacing(2)
-  actionArea.set_size_request(-1, 50)
+  actionArea.setSpacing(6)
+  #actionArea.set_size_request(-1, 50)
   #actionArea.setBorderWidth(6)
 
   let grid = newGrid()
@@ -54,7 +78,7 @@ proc passwordPromt(title: string): string =
   grid.attach(entry, 1, 1, 1, 1)
 
   discard dialog.addButton("Cancel", ResponseType.cancel.ord)
-  discard dialog.addButton("OK", ResponseType.accept.ord)
+  discard dialog.addButton("Authenticate", ResponseType.accept.ord)
   dialog.defaultResponse = ResponseType.accept.ord
 
   contentArea.add(grid)
@@ -74,19 +98,20 @@ proc passwordPromt(title: string): string =
 
 proc main() =
   if paramCount() > 2:
-    echo "error: too many paramters"
+    echo "Error: Too many paramters"
     quit(0)
   elif paramCount() == 0:
     return
 
-  let arg = if paramCount() == 1:
-    paramStr(1)
-  else:
-    paramStr(1) & " " & paramStr(2)
+  let arg =
+    if paramCount() == 1:
+      paramStr(1)
+    else:
+      paramStr(1) & " " & paramStr(2)
   var cmd: string
   var status: int
   var password: string
-  var title = "Authentication required"
+  var title = "Authentication Required"
 
   discard execCmd("sudo -k")
 
